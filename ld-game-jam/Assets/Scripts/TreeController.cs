@@ -11,13 +11,30 @@ public class TreeController : MonoBehaviour {
     private enum Stage { stage1, stage2, stage3 };
     private enum State { normal, damaged, death, hit };
 
-    private Stage stage = Stage.stage1;
-    private State state = State.normal;
+    private Stage stage;
+    private State state;
+    private int current_stage ;
 
+    
     // Start is called before the first frame update
     void Start() {
         animator = GetComponent<Animator>();
         lifeBarAnimator = GameObject.FindWithTag("Lifebar").GetComponent<Animator>();
+        /*if(stage == Stage.stage1) {
+            GrowTree(0);
+        } else if(stage == Stage.stage2) {
+            GrowTree(10);
+        } else if(stage == Stage.stage3) {
+            GrowTree(15);
+        }*/
+        current_stage = GameObject.FindWithTag("Stage Cntr").GetComponent<stage_cntr>().Get_stage();
+        if (current_stage == 0) {          
+            GrowTree(0);
+        } else if (current_stage == 1) {
+            GrowTree(6);
+        } else if (current_stage == 2) {
+            GrowTree(11);
+        } 
     }
 
     // Update is called once per frame
@@ -77,19 +94,21 @@ public class TreeController : MonoBehaviour {
     }
 
     public void GrowTree(int numFertilizer) {
-        if (numFertilizer <= 5) {
+        if (numFertilizer < 5) {
             stage = Stage.stage1;
-        } else if (numFertilizer == 10) {
+        } else if (numFertilizer > 5 && numFertilizer < 10) {
             stage = Stage.stage2;
-        } else if (numFertilizer == 15) {
+        } else if (numFertilizer > 10 && numFertilizer < 15) {
             stage = Stage.stage3;
         }  else
             switch (SceneManager.GetActiveScene().name) {
                 case "SampleScene":
-                    GameObject.FindWithTag("Scenes").GetComponent<Scenes>().load2();
+                    GameObject.FindWithTag("Stage Cntr").GetComponent<stage_cntr>().Set_stage(1);
+                    GameObject.FindWithTag("Scenes").GetComponent<Scenes>().load2();                   
                     break;
                 case "SecondStage":
-                    GameObject.FindWithTag("Scenes").GetComponent<Scenes>().load3();
+                    GameObject.FindWithTag("Stage Cntr").GetComponent<stage_cntr>().Set_stage(2);
+                    GameObject.FindWithTag("Scenes").GetComponent<Scenes>().load3();                   
                     break;
                 case "ThirdStage":
                     break;
@@ -97,12 +116,10 @@ public class TreeController : MonoBehaviour {
     }
 
     private void BackToNormal() {
-        Debug.Log("aatacking");
         state = State.normal;
     }
 
     private void BackToDamaged() {
-        Debug.Log("aatackin2");
         state = State.damaged;
     }
 }

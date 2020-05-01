@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
 
     private bool switcher = true;
     private bool facingLeft = false;
-    private int numFertilizer = 0;
+    private int numFertilizer;
     private bool bullet = false;
 
     [SerializeField] private AudioSource jumpSFX;
@@ -44,6 +44,14 @@ public class PlayerController : MonoBehaviour
         
         // Ingnore collision between player and tree.
         Physics2D.IgnoreCollision(coll, GameObject.FindWithTag("Tree").GetComponent<Collider2D>());       
+
+        if (GameObject.FindWithTag("Stage Cntr").GetComponent<stage_cntr>().Get_stage() == 0) {
+            numFertilizer = 0;
+        } else if (GameObject.FindWithTag("Stage Cntr").GetComponent<stage_cntr>().Get_stage() == 1) {
+            numFertilizer = 5;
+        } else if (GameObject.FindWithTag("Stage Cntr").GetComponent<stage_cntr>().Get_stage() == 2) {
+            numFertilizer = 10;
+        }
     }
 
     // Update is called once per frame
@@ -74,8 +82,7 @@ public class PlayerController : MonoBehaviour
         if (horizontalInput < 0) {
             facingLeft = true;
             spriteRend.flipX = true;
-        }
-        else if (horizontalInput > 0) {
+        } else if (horizontalInput > 0) {
             facingLeft = false;
             spriteRend.flipX = false;
         }
@@ -88,8 +95,7 @@ public class PlayerController : MonoBehaviour
                 Instantiate(beam, new Vector3(transform.position.x - 3, transform.position.y, 0), Quaternion.identity);
 
                 beamSFX.Play();
-            }
-            else {
+            } else {
                 Instantiate(beam, new Vector3(transform.position.x + 3, transform.position.y, 0), Quaternion.identity);
 
                 beamSFX.Play();
@@ -117,8 +123,7 @@ public class PlayerController : MonoBehaviour
         This is ignored when the player it's jumping or falling*/
         else if (Mathf.Abs(player.velocity.x) > Mathf.Epsilon) {
             state = State.run;
-        }
-        else {
+        } else {
             state = State.idle;
         }
         // Debug.Log("state:" + (int)state);
@@ -141,19 +146,16 @@ public class PlayerController : MonoBehaviour
             numFertilizer++;
             GameObject.FindWithTag("Tree").GetComponent<TreeController>().GrowTree(numFertilizer);
             pickUpSFX.Play();
-        }
-        else if (collision.tag == "WaterCan") {
+        } else if (collision.tag == "WaterCan") {
             GameObject.FindWithTag("Tree").GetComponent<TreeController>().AddLife();
             Destroy(collision.gameObject);
             pickUpSFX.Play();
-        }
-        else if (collision.tag == "Energy") {
+        } else if (collision.tag == "Energy") {
             Destroy(collision.gameObject);
             bullet = true;
             pickUpSFX.Play();
             power_up_ui.sprite = power_up_ui_on;
-        }
-        else if (collision.tag == "Seed") {
+        } else if (collision.tag == "Seed") {
             switcher = !switcher;
             Destroy(collision.gameObject);
             GameObject.FindWithTag("Spawner").GetComponent<Spawner>().SpawnMinitrees(true);
